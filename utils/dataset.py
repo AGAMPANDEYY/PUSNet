@@ -33,11 +33,12 @@ class dataset_(Dataset):
         return img
 
 class PairedImageFolder(Dataset):
-    def __init__(self, cover_dir, secret_dir, transform=None):
+    def __init__(self, cover_dir, secret_dir,sigma, transform=None):
         self.cover_dir = cover_dir
         self.secret_dir = secret_dir
         self.transform = transform
-
+        self.sigma=sigma
+        
         self.cover_images = sorted([
             os.path.join(cover_dir, f)
             for f in os.listdir(cover_dir)
@@ -63,6 +64,10 @@ class PairedImageFolder(Dataset):
         if self.transform:
             cover = self.transform(cover)
             secret = self.transform(secret)
+        if self.sigma != None:
+            noised_img_cover = cover + torch.randn(cover.shape).mul_(self.sigma/255)
+            noised_img_secret= secret + torch.randn(secret.shape).mul_(self.sigma/255)
+            return noised_img_cover, noised_img_secret
 
         return cover, secret
 
