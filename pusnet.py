@@ -158,7 +158,7 @@ if c.mode == 'test':
                         noisy_stego = torch.from_numpy(noisy_stego_np).permute(2, 0, 1).unsqueeze(0).to(device)
                     else:
                         raise ValueError(f"Unknown noise_type: {noise_type}")
-             else:
+            else:
                     noisy_stego = stego
 
             stego= noisy_stego
