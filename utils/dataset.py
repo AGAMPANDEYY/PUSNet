@@ -81,6 +81,8 @@ transform_val = T.Compose([
     T.ToTensor(),
 ])
 
+test_data_dir_secret="/kaggle/input/steganaylsis/steganalaysis/secret"
+test_data_dir_cover="/kaggle/input/steganaylsis/steganalaysis/cover"
 
 def load_dataset(train_data_dir, test_data_dir, batchsize_train, batchsize_test, sigma=None):
 
@@ -94,7 +96,7 @@ def load_dataset(train_data_dir, test_data_dir, batchsize_train, batchsize_test,
     )
 
     test_loader = DataLoader(
-        PairedImageFolder(test_data_dir, transform_val, sigma),
+        PairedImageFolder(test_data_dir_cover,test_data_dir_secret ,transform_val, sigma),
         batch_size=batchsize_test,
         shuffle=False,
         pin_memory=True,
