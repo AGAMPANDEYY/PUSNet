@@ -31,7 +31,41 @@ class dataset_(Dataset):
             noised_img = img + torch.randn(img.shape).mul_(self.sigma/255)
             return img, noised_img
         return img
-    
+
+class PairedImageFolder(Dataset):
+    def __init__(self, cover_dir, secret_dir, transform=None):
+        self.cover_dir = cover_dir
+        self.secret_dir = secret_dir
+        self.transform = transform
+
+        self.cover_images = sorted([
+            os.path.join(cover_dir, f)
+            for f in os.listdir(cover_dir)
+            if f.lower().endswith(('.jpg', '.jpeg', '.png'))
+        ])
+
+        self.secret_images = sorted([
+            os.path.join(secret_dir, f)
+            for f in os.listdir(secret_dir)
+            if f.lower().endswith(('.jpg', '.jpeg', '.png'))
+        ])
+
+        assert len(self.cover_images) == len(self.secret_images), \
+            "Mismatch between number of cover and secret images"
+
+    def __len__(self):
+        return len(self.cover_images)
+
+    def __getitem__(self, idx):
+        cover = Image.open(self.cover_images[idx]).convert("RGB")
+        secret = Image.open(self.secret_images[idx]).convert("RGB")
+
+        if self.transform:
+            cover = self.transform(cover)
+            secret = self.transform(secret)
+
+        return cover, secret
+
 
 transform_train = T.Compose([
     T.RandomCrop(c.crop_size_train),
@@ -51,7 +85,7 @@ transform_val = T.Compose([
 def load_dataset(train_data_dir, test_data_dir, batchsize_train, batchsize_test, sigma=None):
 
     train_loader = DataLoader(
-        dataset_(train_data_dir, transform_train, sigma),
+        PairedImageFolder(train_data_dir, transform_train, sigma),
         batch_size=batchsize_train,
         shuffle=True,
         pin_memory=True,
@@ -60,7 +94,7 @@ def load_dataset(train_data_dir, test_data_dir, batchsize_train, batchsize_test,
     )
 
     test_loader = DataLoader(
-        dataset_(test_data_dir, transform_val, sigma),
+        PairedImageFolder(test_data_dir, transform_val, sigma),
         batch_size=batchsize_test,
         shuffle=False,
         pin_memory=True,
