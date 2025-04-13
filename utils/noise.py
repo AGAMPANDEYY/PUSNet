@@ -4,7 +4,7 @@ import torch.nn as nn
 
 class Noise:
 
-    def add_Poisson_noise(img, min_exponent=2.0, max_exponent=4.0):
+    def add_Poisson_noise(self,img, min_exponent=2.0, max_exponent=4.0):
         # First normalize the image to [0, 1] range with proper rounding
         img = np.clip((img * 255.0).round(), 0, 255) / 255.
         
@@ -26,7 +26,7 @@ class Noise:
         img = np.clip(img, 0.0, 1.0)
         return img
     
-    def add_Gaussian_noise(img, noise_level1=2, noise_level2=25):
+    def add_Gaussian_noise(self,img, noise_level1=2, noise_level2=25):
         noise_level = random.randint(noise_level1, noise_level2)
         rnum = np.random.rand()
         if rnum > 0.6:  # add color Gaussian noise
@@ -42,7 +42,7 @@ class Noise:
         img = np.clip(img, 0.0, 1.0)
         return img
     
-    def add_speckle_noise(img, noise_level1=2, noise_level2=25):
+    def add_speckle_noise(self,img, noise_level1=2, noise_level2=25):
         noise_level = random.randint(noise_level1, noise_level2)
         img = np.clip(img, 0.0, 1.0)
         rnum = random.random()
@@ -59,7 +59,7 @@ class Noise:
         img = np.clip(img, 0.0, 1.0)
         return img
         
-    def salt_and_pepper_noise(img, prob=0.05):
+    def salt_and_pepper_noise(self,img, prob=0.05):
         """
         Add salt-and-pepper (impulse) noise to an image.
         
@@ -94,7 +94,7 @@ class Noise:
         
         return np.clip(output, 0.0, 1.0)
         
-    def adjust_brightness_torch(img, factor=1.0, beta=0.0):
+    def adjust_brightness_torch(self,img, factor=1.0, beta=0.0):
         """
         Adjust image brightness in a differentiable manner.
         
@@ -112,7 +112,7 @@ class Noise:
         img = torch.clamp(img, 0, 1)
         return img
         
-    def pixelate(x, pixel_size=4, severity=None):
+    def pixelate(self,x, pixel_size=4, severity=None):
         """
         Apply pixelation effect to an image without changing its dimensions.
         
@@ -147,7 +147,7 @@ class Noise:
         
         return result
         
-    def saturate(x, severity=1):
+    def saturate(self,x, severity=1):
         c = [(0.3, 0), (0.1, 0), (2, 0), (5, 0.1), (20, 0.2)][severity - 1]
         
         x = np.array(x) / 255.
@@ -521,7 +521,7 @@ class Noise:
             quality = 200. - quality*2
         return quality / 100.
         
-    def jpeg_compress_decompress(image,rounding=round_only_at_0,quality=80):
+    def jpeg_compress_decompress(self,image,rounding=round_only_at_0,quality=80):
     
             height, width = image.shape[2:4]
             
@@ -535,14 +535,14 @@ class Noise:
         
             return recovered.contiguous()
     
-    def gaussian_blur(x, severity=1):
+    def gaussian_blur(self,x, severity=1):
         c = [1, 2, 3, 4, 6][severity - 1]
         # Normalize input, apply gaussian filter, then scale back up.
         x = gaussian(np.array(x) / 255., sigma=c, channel_axis=-1)
         return np.clip(x, 0, 1) * 255
         
         
-    def spatter(x, severity=1):
+    def spatter(self,x, severity=1):
         c = [(0.65, 0.3, 4, 0.69, 0.6, 0),
            (0.65, 0.3, 3, 0.68, 0.6, 0),
            (0.65, 0.3, 2, 0.68, 0.5, 0),
@@ -594,7 +594,7 @@ class Noise:
           return np.clip(x + color, 0, 1) * 255
         
     
-    def disk(radius, alias_blur=0.1, dtype=np.float32):
+    def disk(self,radius, alias_blur=0.1, dtype=np.float32):
         if radius <= 8:
           L = np.arange(-8, 8 + 1)
           ksize = (3, 3)
@@ -609,7 +609,7 @@ class Noise:
         return cv2.GaussianBlur(aliased_disk, ksize=ksize, sigmaX=alias_blur)
         
         
-    def defocus_blur(x, severity=1):
+    def defocus_blur(self,x, severity=1):
         
         c = [(3, 0.1), (4, 0.5), (6, 0.5), (8, 0.5), (10, 0.5)][severity - 1]
         
