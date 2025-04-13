@@ -6,7 +6,6 @@ import torch
 import os
 from PIL import Image
 import config as c
-import noise
 
 class dataset_(Dataset):
     def __init__(self, img_dir, transform, sigma):
