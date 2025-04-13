@@ -19,6 +19,7 @@ from utils.dirs import mkdirs
 from utils.model import load_model
 import config as c
 from utils.proposed_mothod import generate_sparse_mask, init_weights, remove_adapter, insert_adapter
+import csv
 
 
 os.environ["CUDA_VISIBLE_DEVICES"] = c.pusnet_device_ids
@@ -63,6 +64,17 @@ model_hiding_seed = nn.DataParallel(model_hiding_seed)
 model_recover_seed = nn.DataParallel(model_recover_seed)
 
 test_loader = load_dataset(c.train_data_dir, c.test_data_dir, c.pusnet_batch_size_train, c.pusnet_batch_size_test, c.pusnet_sigma)
+
+csv_path = os.path.join('results', 'metrics.csv')
+
+# If file doesn't exist, write headers
+if not os.path.exists(csv_path):
+    with open(csv_path, mode='w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(['S_psnr', 'R_psnr', 'N_psnr', 'DN_psnr', 
+                         'S_ssim', 'R_ssim', 'N_ssim', 'DN_ssim', 
+                         'S_mae', 'R_mae', 'N_mae', 'DN_mae', 
+                         'S_rmse', 'R_rmse', 'N_rmse', 'DN_rmse'])
 
 if c.mode == 'test':
     model.load_state_dict(torch.load(c.test_pusnet_path))
@@ -168,6 +180,18 @@ if c.mode == 'test':
         logger.info('testing, stego_avg_ssim: {:.4f}, secret_avg_ssim: {:.4f}, noise_avg_ssim: {:.4f}, denoise_avg_ssim: {:.4f}'.format(np.mean(S_ssim), np.mean(R_ssim), np.mean(N_ssim), np.mean(DN_ssim)))
         logger.info('testing, stego_avg_mae: {:.2f}, secret_avg_mae: {:.2f}, noise_avg_mae: {:.2f}, denoise_avg_mae: {:.2f}'.format(np.mean(S_mae), np.mean(R_mae), np.mean(N_mae), np.mean(DN_mae)))
         logger.info('testing, stego_avg_rmse: {:.2f}, secret_avg_rmse: {:.2f}, noise_avg_rmse: {:.2f}, denoise_avg_rmse: {:.2f}'.format(np.mean(S_rmse), np.mean(R_rmse), np.mean(N_rmse), np.mean(DN_rmse)))
+        # After computing your metrics in the testing loop
+        avg_psnr = [np.mean(S_psnr), np.mean(R_psnr), np.mean(N_psnr), np.mean(DN_psnr)]
+        avg_ssim = [np.mean(S_ssim), np.mean(R_ssim), np.mean(N_ssim), np.mean(DN_ssim)]
+        avg_mae = [np.mean(S_mae), np.mean(R_mae), np.mean(N_mae), np.mean(DN_mae)]
+        avg_rmse = [np.mean(S_rmse), np.mean(R_rmse), np.mean(N_rmse), np.mean(DN_rmse)]
+        
+        # Open CSV file and write the final averages
+        with open(csv_path, mode='a', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(avg_psnr + avg_ssim + avg_mae + avg_rmse)
+        
+        logger.info(f'Written final metrics to CSV.')
 
 else:
     secret_recover_loss = nn.MSELoss().to(device)
