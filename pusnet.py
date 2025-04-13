@@ -97,6 +97,7 @@ if c.mode == 'test':
 
         model.eval()
         stream = tqdm(test_loader)
+        noise_type=c.noise_type
         for idx, (data, noised_data) in enumerate(stream):
             data = data.to(device)
             noised_data = noised_data.to(device)
@@ -111,6 +112,56 @@ if c.mode == 'test':
             denoised = model(noised, None, 'denoising') # pusnet-p
             insert_adapter(model, sparse_mask, model_hiding_seed)  
             stego = model(secret, cover, 'hiding') # pusnet-E
+
+            if noise_type is not None:
+                    if noise_type == 'poisson':
+                        # Convert to numpy [0, 1], shape (H, W, C)
+                        stego_np = stego.cpu().numpy().transpose(0, 2, 3, 1)[0]
+                        noisy_stego_np = noise.add_Poisson_noise(stego_np)
+                        noisy_stego = torch.from_numpy(noisy_stego_np).permute(2, 0, 1).unsqueeze(0).to(device)
+                    elif noise_type == 'gaussian':
+                        stego_np = stego.cpu().numpy().transpose(0, 2, 3, 1)[0]
+                        noisy_stego_np = noise.add_Gaussian_noise(stego_np, **noise_params)
+                        noisy_stego = torch.from_numpy(noisy_stego_np).permute(2, 0, 1).unsqueeze(0).to(device)
+                    elif noise_type == 'speckle':
+                        stego_np = stego.cpu().numpy().transpose(0, 2, 3, 1)[0]
+                        noisy_stego_np = noise.add_speckle_noise(stego_np, **noise_params)
+                        noisy_stego = torch.from_numpy(noisy_stego_np).permute(2, 0, 1).unsqueeze(0).to(device)
+                    elif noise_type == 'salt_and_pepper':
+                        stego_np = stego.cpu().numpy().transpose(0, 2, 3, 1)[0]
+                        noisy_stego_np = noise.salt_and_pepper_noise(stego_np, **noise_params)
+                        noisy_stego = torch.from_numpy(noisy_stego_np).permute(2, 0, 1).unsqueeze(0).to(device)
+                    elif noise_type == 'brightness':
+                        noisy_stego = noise.adjust_brightness_torch(steg_img, **noise_params)
+                    elif noise_type == 'jpeg':
+                        noisy_stego = noise.jpeg_compress_decompress(steg_img, **noise_params)
+                    elif noise_type == 'pixelate':
+                        stego_np = steg_img.cpu().numpy().transpose(0, 2, 3, 1)[0]
+                        noisy_stego_np = noise.pixelate(stego_np, **noise_params)
+                        noisy_stego = torch.from_numpy(noisy_stego_np).permute(2, 0, 1).unsqueeze(0).to(device)
+                    elif noise_type == 'saturate':
+                        stego_np = stego.cpu().numpy().transpose(0, 2, 3, 1)[0]
+                        noisy_stego_np = noise.saturate(stego_np, **noise_params)
+                        noisy_stego = torch.from_numpy(noisy_stego_np).permute(2, 0, 1).unsqueeze(0).to(device)
+                    elif noise_type == 'gaussian_blur':
+                        stego_np = stego.cpu().numpy().transpose(0, 2, 3, 1)[0]
+                        noisy_stego_np = noise.gaussian_blur(stego_np, **noise_params)
+                        noisy_stego = torch.from_numpy(noisy_stego_np).permute(2, 0, 1).unsqueeze(0).to(device)
+                    elif noise_type == 'spatter':
+                        stego_np = stego.cpu().numpy().transpose(0, 2, 3, 1)[0]
+                        noisy_stego_np = noise.spatter(stego_np, **noise_params)
+                        noisy_stego = torch.from_numpy(noisy_stego_np).permute(2, 0, 1).unsqueeze(0).to(device)
+                    elif noise_type == 'defocus_blur':
+                        stego_np = stego.cpu().numpy().transpose(0, 2, 3, 1)[0]
+                        noisy_stego_np = noise.defocus_blur(stego_np, **noise_params)
+                        noisy_stego = torch.from_numpy(noisy_stego_np).permute(2, 0, 1).unsqueeze(0).to(device)
+                    else:
+                        raise ValueError(f"Unknown noise_type: {noise_type}")
+             else:
+                    noisy_stego = stego
+
+            stego= noisy_stego
+            
             insert_adapter(model, sparse_mask, model_recover_seed, is_sparse=False)  
             secret_rev = model(stego, None, 'recover') # pusnet-D
 
