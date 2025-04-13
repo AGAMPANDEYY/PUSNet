@@ -161,7 +161,7 @@ if c.mode == 'test':
                         noisy_stego = torch.from_numpy(noisy_stego_np).permute(2, 0, 1).unsqueeze(0).to(device)
                     elif noise_type == 'gaussian':
                         stego_np = stego.cpu().numpy().transpose(0, 2, 3, 1)[0]
-                        noisy_stego_np = noise.add_Gaussian_noise(stego_np, noise_params['noise_level1'], noise_params['noise_level2'])
+                        noisy_stego_np = noise.add_Gaussian_noise(stego_np, noise_level1=noise_params['noise_level1'],noise_level2=noise_params['noise_level2'])
                         noisy_stego = torch.from_numpy(noisy_stego_np).permute(2, 0, 1).unsqueeze(0).to(device)
                     elif noise_type == 'speckle':
                         stego_np = stego.cpu().numpy().transpose(0, 2, 3, 1)[0]
