@@ -48,13 +48,39 @@ logger.info('sparse ration: {:s}'.format(str(c.sparse_ratio)))
 model_hiding_seed = pusnet()
 model_recover_seed = pusnet()
 
+
+##################Noise####################
 noise=Noise()
 noise_type=c.noise_type
+# List of all noise types with their parameters
+noise_configs = [
+    # No noise baseline
+    {"noise_type": None, "noise_params": {}},
+     
+    # Standard noise types
+    {"noise_type": "gaussian", "noise_params": {"noise_level1": 5, "noise_level2": 20}},
+    {"noise_type": "poisson", "noise_params": {"min_exponent":2.0, "max_exponent":4.0}},
+    # Change this line in noise_configs:
+    {"noise_type": "speckle", "noise_params": {"noise_level1": 2, "noise_level2": 5}},
+    {"noise_type": "salt_and_pepper", "noise_params": {"prob": 0.05}},
+    
+    # Image processing distortions
+    {"noise_type": "brightness", "noise_params": {"factor": 1.2}},
+    {"noise_type": "jpeg", "noise_params": {"quality": 50}},
+    {"noise_type": "pixelate", "noise_params": {"pixel_size": 4}},
+    {"noise_type": "saturate", "noise_params": {"severity": 2}},
+    
+    # Blur effects
+    {"noise_type": "gaussian_blur", "noise_params": {"severity": 3}},
+    {"noise_type": "defocus_blur", "noise_params": {"severity": 1}},
+    
+    # More challenging distortion
+    {"noise_type": "spatter", "noise_params": {"severity": 3}},
+]
 
 # mask generation accoding to random seed '1'
 init_weights(model_hiding_seed, random_seed=1)
 sparse_mask = generate_sparse_mask(model_hiding_seed, sparse_ratio=c.sparse_ratio)
-
 
 for idx in range(len(sparse_mask)):
     sparse_mask[idx] = sparse_mask[idx].to(device)
@@ -87,17 +113,31 @@ if not os.path.exists(csv_path):
                          'S_rmse', 'R_rmse', 'N_rmse', 'DN_rmse'])
 
 if c.mode == 'test':
-    model.load_state_dict(torch.load(c.test_pusnet_path))
+  model.load_state_dict(torch.load(c.test_pusnet_path))
     # model = nn.DataParallel(model)
+  for config in noise_configs:
+    noise_type = config["noise_type"]
+    noise_params = config["noise_params"]
+
+    log_suffix = noise_type if noise_type is not None else "no_noise"
+    logger_name = f"pusnet_{log_suffix}"
+    log_file = os.path.join("results", f"{logger_name}.log")
+
+    # Setup logger for this noise config
+    logger_info(logger_name, log_path=log_file)
+    logger = logging.getLogger(logger_name)
+    logger.info(f"\n{'#' * 20} TESTING: {log_suffix} {'#' * 20}")
+
+    # Initialize metric lists
+    S_psnr, S_ssim, S_mae, S_rmse = [], [], [], []
+    R_psnr, R_ssim, R_mae, R_rmse = [], [], [], []
+    N_psnr, N_ssim, N_mae, N_rmse = [], [], [], []
+    DN_psnr, DN_ssim, DN_mae, DN_rmse = [], [], [], []
 
     with torch.no_grad():
-        S_psnr = []; S_ssim = []; S_mae = []; S_rmse = []
-        R_psnr = []; R_ssim = []; R_mae = []; R_rmse = []
-        N_psnr = []; N_ssim = []; N_mae = []; N_rmse = []
-        DN_psnr = []; DN_ssim = []; DN_mae = []; DN_rmse = []
 
         model.eval()
-        stream = tqdm(test_loader)
+        stream = tqdm(test_loader, desc=f"[{log_suffix}]")
        
         for idx, (data, noised_data) in enumerate(stream):
             data = data.to(device)
@@ -246,13 +286,15 @@ if c.mode == 'test':
         avg_ssim = [np.mean(S_ssim), np.mean(R_ssim), np.mean(N_ssim), np.mean(DN_ssim)]
         avg_mae = [np.mean(S_mae), np.mean(R_mae), np.mean(N_mae), np.mean(DN_mae)]
         avg_rmse = [np.mean(S_rmse), np.mean(R_rmse), np.mean(N_rmse), np.mean(DN_rmse)]
-        
-        # Open CSV file and write the final averages
-        with open(csv_path, mode='a', newline='') as f:
+            # Save metrics to CSV
+        csv_out_path = os.path.join("results", f"metrics_{log_suffix}.csv")
+        with open(csv_out_path, mode='w', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(avg_psnr + avg_ssim + avg_mae + avg_rmse)
-        
-        logger.info(f'Written final metrics to CSV.')
+            writer.writerow(['S_psnr', 'R_psnr'])
+            for i in range(len(S_psnr)):
+                writer.writerow([S_psnr[i], R_psnr[i]])
+                
+        logger.info(f"Finished testing for noise: {noise_type}")
 
 else:
     secret_recover_loss = nn.MSELoss().to(device)
@@ -387,6 +429,3 @@ else:
             torch.save(model.state_dict(), os.path.join(model_save_dir, 'checkpoint_%.4i' % epoch + '.pt'))
             
         scheduler.step()
-
-
-    
