@@ -62,7 +62,7 @@ model = nn.DataParallel(model)
 model_hiding_seed = nn.DataParallel(model_hiding_seed)
 model_recover_seed = nn.DataParallel(model_recover_seed)
 
-train_loader, test_loader = load_dataset(c.train_data_dir, c.test_data_dir, c.pusnet_batch_size_train, c.pusnet_batch_size_test, c.pusnet_sigma)
+test_loader = load_dataset(c.train_data_dir, c.test_data_dir, c.pusnet_batch_size_train, c.pusnet_batch_size_test, c.pusnet_sigma)
 
 if c.mode == 'test':
     model.load_state_dict(torch.load(c.test_pusnet_path))
