@@ -42,7 +42,7 @@ resi_magnification = 5
 
 
 
-
+noise_type='gaussian'
 
 
 
