@@ -90,7 +90,7 @@ class Noise:
         
         return np.clip(output, 0.0, 1.0)
         
-        def adjust_brightness_torch(img, factor=1.0, beta=0.0):
+    def adjust_brightness_torch(img, factor=1.0, beta=0.0):
         """
         Adjust image brightness in a differentiable manner.
         
@@ -143,7 +143,7 @@ class Noise:
         
         return result
         
-        def saturate(x, severity=1):
+    def saturate(x, severity=1):
         c = [(0.3, 0), (0.1, 0), (2, 0), (5, 0.1), (20, 0.2)][severity - 1]
         
         x = np.array(x) / 255.
@@ -174,7 +174,7 @@ class Noise:
         return np.clip(x, 0, 1) * 255
         
         
-        def spatter(x, severity=1):
+    def spatter(x, severity=1):
         c = [(0.65, 0.3, 4, 0.69, 0.6, 0),
            (0.65, 0.3, 3, 0.68, 0.6, 0),
            (0.65, 0.3, 2, 0.68, 0.5, 0),
@@ -241,7 +241,7 @@ class Noise:
         return cv2.GaussianBlur(aliased_disk, ksize=ksize, sigmaX=alias_blur)
         
         
-        def defocus_blur(x, severity=1):
+    def defocus_blur(x, severity=1):
         
         c = [(3, 0.1), (4, 0.5), (6, 0.5), (8, 0.5), (10, 0.5)][severity - 1]
         
