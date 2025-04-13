@@ -92,7 +92,7 @@ test_data_dir_cover="/kaggle/input/steganaylsis/steganalaysis/cover"
 def load_dataset(train_data_dir, test_data_dir, batchsize_train, batchsize_test, sigma=None):
 
     test_loader = DataLoader(
-        PairedImageFolder(test_data_dir_cover,test_data_dir_secret ,transform_val, sigma),
+        PairedImageFolder(test_data_dir_cover,test_data_dir_secret ,sigma,transform_val),
         batch_size=batchsize_test,
         shuffle=False,
         pin_memory=True,
