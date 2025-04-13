@@ -161,7 +161,7 @@ if c.mode == 'test':
                         noisy_stego = torch.from_numpy(noisy_stego_np).permute(2, 0, 1).unsqueeze(0).to(device)
                     elif noise_type == 'gaussian':
                         stego_np = stego.cpu().numpy().transpose(0, 2, 3, 1)[0]
-                        noisy_stego_np = noise.add_Gaussian_noise(stego_np, **noise_params)
+                        noisy_stego_np = noise.add_Gaussian_noise(stego_np, noise_params['noise_level1'], noise_params['noise_level2'])
                         noisy_stego = torch.from_numpy(noisy_stego_np).permute(2, 0, 1).unsqueeze(0).to(device)
                     elif noise_type == 'speckle':
                         stego_np = stego.cpu().numpy().transpose(0, 2, 3, 1)[0]
@@ -172,9 +172,9 @@ if c.mode == 'test':
                         noisy_stego_np = noise.salt_and_pepper_noise(stego_np, **noise_params)
                         noisy_stego = torch.from_numpy(noisy_stego_np).permute(2, 0, 1).unsqueeze(0).to(device)
                     elif noise_type == 'brightness':
-                        noisy_stego = noise.adjust_brightness_torch(steg_img, **noise_params)
+                        noisy_stego = noise.adjust_brightness_torch(stego, **noise_params)
                     elif noise_type == 'jpeg':
-                        noisy_stego = noise.jpeg_compress_decompress(steg_img, **noise_params)
+                        noisy_stego = noise.jpeg_compress_decompress(stego, **noise_params)
                     elif noise_type == 'pixelate':
                         stego_np = steg_img.cpu().numpy().transpose(0, 2, 3, 1)[0]
                         noisy_stego_np = noise.pixelate(stego_np, **noise_params)
