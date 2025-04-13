@@ -49,6 +49,7 @@ model_hiding_seed = pusnet()
 model_recover_seed = pusnet()
 
 noise=noise()
+noise_type=c.noise_type
 
 # mask generation accoding to random seed '1'
 init_weights(model_hiding_seed, random_seed=1)
@@ -97,7 +98,7 @@ if c.mode == 'test':
 
         model.eval()
         stream = tqdm(test_loader)
-        noise_type=c.noise_type
+       
         for idx, (data, noised_data) in enumerate(stream):
             data = data.to(device)
             noised_data = noised_data.to(device)
