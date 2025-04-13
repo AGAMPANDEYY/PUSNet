@@ -54,12 +54,11 @@ noise=Noise()
 noise_type=c.noise_type
 # List of all noise types with their parameters
 noise_configs = [
-    # No noise baseline
-    {"noise_type": None, "noise_params": {}},
-     
-    # Standard noise types
+     # Standard noise types
     {"noise_type": "gaussian", "noise_params": {"noise_level1": 5, "noise_level2": 20}},
     {"noise_type": "poisson", "noise_params": {"min_exponent":2.0, "max_exponent":4.0}},
+    # No noise baseline
+    {"noise_type": None, "noise_params": {}},
     # Change this line in noise_configs:
     {"noise_type": "speckle", "noise_params": {"noise_level1": 2, "noise_level2": 5}},
     {"noise_type": "salt_and_pepper", "noise_params": {"prob": 0.05}},
