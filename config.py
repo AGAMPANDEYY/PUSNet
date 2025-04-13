@@ -12,7 +12,7 @@ gamma = 0.5
 crop_size_train = 256  # size for training
 resize_size_test = 512  # size for testing
 train_data_dir = ''
-test_data_dir = '/kaggle/input/steganaylsis/steganalaysis'
+test_data_dir = ''
 # Saving checkpoints
 test_freq = 50
 save_freq = 50
