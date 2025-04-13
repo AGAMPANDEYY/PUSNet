@@ -17,6 +17,7 @@ from utils.image import calculate_psnr, calculate_ssim, calculate_mae, calculate
 from utils.dataset import load_dataset
 from utils.dirs import mkdirs
 from utils.model import load_model
+from utils.noise import noise
 import config as c
 from utils.proposed_mothod import generate_sparse_mask, init_weights, remove_adapter, insert_adapter
 import csv
@@ -46,6 +47,8 @@ logger.info('sparse ration: {:s}'.format(str(c.sparse_ratio)))
 ################## prepare ####################
 model_hiding_seed = pusnet()
 model_recover_seed = pusnet()
+
+noise=noise()
 
 # mask generation accoding to random seed '1'
 init_weights(model_hiding_seed, random_seed=1)
