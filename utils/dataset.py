@@ -4,13 +4,9 @@ import torchvision.transforms as T
 import numpy as np
 import torch
 import os
-# import albumentations as A
-# from albumentations.pytorch import ToTensorV2
-# import cv2
 from PIL import Image
-# import sys 
-# sys.path.append(".")
 import config as c
+import noise
 
 class dataset_(Dataset):
     def __init__(self, img_dir, transform, sigma):
