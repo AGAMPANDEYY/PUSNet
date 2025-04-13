@@ -1,3 +1,5 @@
+import numpy as np
+
 class Noise:
 
     def add_Poisson_noise(img, min_exponent=2.0, max_exponent=4.0):
