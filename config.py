@@ -34,7 +34,7 @@ pusnet_p_batch_size_test = 2
 ################################################
 #                   testing                   #
 ################################################
-test_pusnet_path = '/kaggle/input/steganaylsis/steganalaysis/'
+test_pusnet_path = '/kaggle/input/pusnet/pytorch/default/1/pusnet_checkpoint_2150.pt' #'/kaggle/input/steganaylsis/steganalaysis/'
 test_pusnet_p_path = '/kaggle/input/pusnet/pytorch/default/1/pusnet_checkpoint_2150.pt'
 save_processed_img = True
 resi_magnification = 5
