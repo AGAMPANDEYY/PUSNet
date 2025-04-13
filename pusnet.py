@@ -21,6 +21,12 @@ import config as c
 from utils.proposed_mothod import generate_sparse_mask, init_weights, remove_adapter, insert_adapter
 import csv
 
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+logger.addHandler(handler)
+
 
 os.environ["CUDA_VISIBLE_DEVICES"] = c.pusnet_device_ids
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
