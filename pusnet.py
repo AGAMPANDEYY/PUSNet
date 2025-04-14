@@ -142,7 +142,7 @@ if c.mode == 'test':
         stream = tqdm(test_loader, desc=f"[{log_suffix}]")
        
         #for idx, (data, noised_data) in enumerate(stream):
-         for idx, (cover, noised_cover, secret, noised_secret) in enumerate(stream):
+        for idx, (cover, noised_cover, secret, noised_secret) in enumerate(stream):
             #data = data.to(device)
             #noised_data = noised_data.to(device)
 
