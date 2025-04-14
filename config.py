@@ -21,7 +21,7 @@ model_save_dir = 'model_zoo'
 # pusnet
 pusnet_device_ids = '0, 1, 2, 3'
 pusnet_batch_size_train = 8
-pusnet_batch_size_test = 2
+pusnet_batch_size_test = 1 #2
 pusnet_sigma = 20
 pusnet_lambda_S = 1.0
 pusnet_lambda_R = 0.75
