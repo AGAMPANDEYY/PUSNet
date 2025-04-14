@@ -62,7 +62,7 @@ class PairedImageFolder(Dataset):
         if self.sigma != None:
             noised_img_cover = cover + torch.randn(cover.shape).mul_(self.sigma/255)
             noised_img_secret= secret + torch.randn(secret.shape).mul_(self.sigma/255)
-            return noised_img_cover, noised_img_secret
+            return cover, noised_img_cover, secret, noised_img_secret
 
         return cover, secret
 
