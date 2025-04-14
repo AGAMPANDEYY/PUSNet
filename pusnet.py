@@ -152,7 +152,7 @@ if c.mode == 'test':
             noised_secret= noised_secret.to(device)
               
             clean = secret
-            noised = noised_cover[noised_cover.shape[0]//2:]
+            noised = noised_cover
               
             # in old code they were taking equal numbers from each batch 
             """
