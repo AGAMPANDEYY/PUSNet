@@ -77,6 +77,9 @@ noise_configs = [
     {"noise_type": "spatter", "noise_params": {"severity": 3}},
 ]
 
+########### For steganalysis need no noise BASELINE so changing noise_configs #######
+noise_configs=[{"noise_type": None, "noise_params": {}}]
+
 # mask generation accoding to random seed '1'
 init_weights(model_hiding_seed, random_seed=1)
 sparse_mask = generate_sparse_mask(model_hiding_seed, sparse_ratio=c.sparse_ratio)
@@ -138,14 +141,26 @@ if c.mode == 'test':
         model.eval()
         stream = tqdm(test_loader, desc=f"[{log_suffix}]")
        
-        for idx, (data, noised_data) in enumerate(stream):
-            data = data.to(device)
-            noised_data = noised_data.to(device)
-            
+        #for idx, (data, noised_data) in enumerate(stream):
+         for idx, (cover, noised_cover, secret, noised_secret) in enumerate(stream):
+            #data = data.to(device)
+            #noised_data = noised_data.to(device)
+
+            cover=cover.to(device)
+            noised_cover= noised_cover.to(device)
+            secret=secret.to(device)
+            noised_secret= noised_secret.to(device)
+              
+            clean = secret
+            noised = noised_cover[noised_cover.shape[0]//2:]
+              
+            # in old code they were taking equal numbers from each batch 
+            """
             secret = data[data.shape[0]//2:]
             cover = data[:data.shape[0]//2]
             clean = secret
             noised = noised_data[noised_data.shape[0]//2:]
+            """
     
             ################## forward ####################
             remove_adapter(model, sparse_mask)  
