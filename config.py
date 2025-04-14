@@ -39,9 +39,6 @@ test_pusnet_p_path = ''
 save_processed_img = True
 resi_magnification = 5
 
-
-
-
 noise_type='gaussian'
 
 
